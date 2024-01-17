@@ -1,11 +1,15 @@
-package org.example;
-import java.sql.*;
+
+import db.MySQLConnector;
 
 import static db.MySQLConnector.connection;
 import static java.sql.DriverManager.getConnection;
 
+import java.sql.*;
+
+import static java.sql.DriverManager.getConnection;
+
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         // Подключение к базе данных
         String url = "jdbc:mysql://localhost:3306/test1";
         String username = "root";
@@ -101,12 +105,11 @@ public class Main {
                 System.out.println(studentFIO);
             }
 
-            // Закрываем соединение с базой данных
-            connection.close();
-        } catch (SQLException e) {
+            //Закрываем соединение с базой данных
+                connection.close();
+            }
+            catch (SQLException e) {
             e.printStackTrace();
+            }
         }
     }
-}
-
-

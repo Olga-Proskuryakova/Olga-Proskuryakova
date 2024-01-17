@@ -14,22 +14,30 @@ public class MySQLConnector implements IDBConnector {
         connect();
     }
 
+    public static Connection getConnection() {
+        return connection;
+    }
+
+    public static void setConnection(Connection connection) {
+        MySQLConnector.connection = connection;
+    }
+
     private void connect() {
         ISettings reader = new PropertiesReader();
         Map<String, String> settings = reader.read();
-        if (connection == null) {
+        if (getConnection() == null) {
             try {
-                connection = DriverManager
+                setConnection(DriverManager
                         .getConnection(settings.get("url") + "/" + settings.get("db_name"),
                                 settings.get("db_username"),
-                                settings.get("db_password"));
+                                settings.get("db_password")));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         if (statement == null) {
             try {
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -61,9 +69,9 @@ public class MySQLConnector implements IDBConnector {
                 e.printStackTrace();
             }
         }
-        if (connection != null) {
+        if (getConnection() != null) {
             try {
-                connection.close();
+                getConnection().close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
