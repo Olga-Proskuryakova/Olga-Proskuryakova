@@ -3,14 +3,19 @@ package object;
 public class Group {
     private int id;
     private String name;
-    private int curatorId;
+    private int id_curator;
 
-    public Group(int id, String name, int curatorId) {
-        this.id = id;
+
+    public Group(String name, int id_curator) {
         this.name = name;
-        this.curatorId = curatorId;
+        this.id_curator = id_curator;
     }
 
+    public Group(int id, String name, int id_curator) {
+        this.id = id;
+        this.name = name;
+        this.id_curator = id_curator;
+    }
 
     public int getId() {
         return id;
@@ -28,12 +33,20 @@ public class Group {
         this.name = name;
     }
 
-    public int getCuratorId() {
-        return curatorId;
+    public int getId_curator() {
+        return id_curator;
     }
 
-    public void setCuratorId(int curatorId) {
-        this.curatorId = curatorId;
+    public void setId_curator(int id_curator) {
+        this.id_curator = id_curator;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", id_curator=" + id_curator +
+                '}';
     }
 }
-

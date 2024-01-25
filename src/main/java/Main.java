@@ -1,115 +1,82 @@
-
 import db.MySQLConnector;
-
-import static db.MySQLConnector.connection;
-import static java.sql.DriverManager.getConnection;
+import object.Curator;
+import object.Group;
+import object.Student;
+import tables.CuratorTable;
+import tables.GroupTable;
+import tables.StudentsTable;
 
 import java.sql.*;
-
-import static java.sql.DriverManager.getConnection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        // Подключение к базе данных
-        String url = "jdbc:mysql://localhost:3306/test1";
-        String username = "root";
-        String password = "140603@_Pov";
-
+    public static void main(String[] args) throws SQLException {
         try {
-            // Устанавливаем соединение с базой данных
-            Connection connection = getConnection("jdbc:mysql://localhost:3306/test1", "root", "140603@_Pov");
 
-            // Создаем таблицу Student
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Student (id INT PRIMARY KEY, fio VARCHAR(50), " +
-                    "sex VARCHAR(10), id_group INT)");
+            StudentsTable studentsTable = new StudentsTable();
+            ArrayList<Student> students = studentsTable.selectAll();
+            if (students.isEmpty()) {
+                studentsTable.insert(new Student("Некрасов Роман Даниилович", "муж", 1));
+                studentsTable.insert(new Student("Тихомирова Варвара Григорьевна", "жен", 2));
+                studentsTable.insert(new Student("Кожевникова Надежда Ивановна", "жен", 3));
+                studentsTable.insert(new Student("Любимов Руслан Григорьевич", "муж", 1));
+                studentsTable.insert(new Student("Некрасова Александра Андреевна", "жен", 2));
+                studentsTable.insert(new Student("Алексеев Богдан Львович", "муж", 3));
+                studentsTable.insert(new Student("Лебедева Александра Романовна", "жен", 1));
+                studentsTable.insert(new Student("Осипов Леонид Степанович", "муж", 2));
+                studentsTable.insert(new Student("Герасимова Таисия Никитична", "жен", 3));
+                studentsTable.insert(new Student("Попов Тимур Кириллович", "муж", 1));
+                studentsTable.insert(new Student("Федорова Екатерина Леонидовна", "жен", 2));
+                studentsTable.insert(new Student("Гуляев Владимир Мартинович", "муж", 3));
+                studentsTable.insert(new Student("Крылова Кристина Львовна", "жен", 1));
+                studentsTable.insert(new Student("Филиппов Марк Дмитриевич", "муж", 2));
+                studentsTable.insert(new Student("Фролов Марк Андреевич", "муж", 3));
 
-            // Создаем таблицу Group
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Group_table (id INT PRIMARY KEY, " +
-                    "name VARCHAR(50), id_curator INT)");
-
-            // Создаем таблицу Curator
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Curator (id INT PRIMARY KEY, fio VARCHAR(50))");
-
-            // Заполняем таблицы данными
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (1, 'Иванов Иван', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (2, 'Петров Петр', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (3, 'Сидорова Ирина', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (4, 'Смирнова Ольга', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (5, 'Козлов Дмитрий', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (6, 'Синьков Антон', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (7, 'Лепилова Марина', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (8, 'Злобнина Алина', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (10, 'Конев Сергей', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (11, 'Дебрин Владимир', 'М', 1)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (12, 'Сучкова Алла', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (13, 'Борзикова Полина', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (14, 'Демидова Лена', 'Ж', 2)");
-            statement.executeUpdate("INSERT INTO Student (id, fio, sex, id_group) VALUES (15, 'Полякова Мария', 'Ж', 2)");
-            // ...
-
-            statement.executeUpdate("INSERT INTO Group_table (id, name, id_curator) VALUES (1, 'Группа 1', 1)");
-            statement.executeUpdate("INSERT INTO Group_table (id, name, id_curator) VALUES (2, 'Группа 2', 2)");
-            statement.executeUpdate("INSERT INTO Group_table (id, name, id_curator) VALUES (3, 'Группа 3', 3)");
-            // ...
-
-            statement.executeUpdate("INSERT INTO Curator (id, fio) VALUES (1, 'Козлова Ирина')");
-            statement.executeUpdate("INSERT INTO Curator (id, fio) VALUES (2, 'Лозырева Анна')");
-            statement.executeUpdate("INSERT INTO Curator (id, fio) VALUES (3, 'Маликов Иван')");
-            statement.executeUpdate("INSERT INTO Curator (id, fio) VALUES (4, 'Гончаров Евгений')");
-            // ...
-
-            // Выводим информацию о всех студентах включая название группы и имя куратора
-            ResultSet result = statement.executeQuery("SELECT Student.fio, Group_table.name, Curator.fio FROM Student " +
-                    "INNER JOIN Group_table ON Student.id_group = Group_table.id INNER JOIN Curator ON Group_table.id_curator = Curator.id");
-            while (result.next()) {
-                String studentFIO = result.getString(1);
-                String groupName = result.getString(2);
-                String curatorName = result.getString(3);
-                System.out.println(studentFIO + " - " + groupName + ", куратор: " + curatorName);
             }
 
-            // Выводим количество студентов
-            ResultSet countResult = statement.executeQuery("SELECT COUNT(*) FROM Student");
-            if (countResult.next()) {
-                int count = countResult.getInt(1);
-                System.out.println("Количество студентов: " + count);
+            GroupTable groupTable = new GroupTable();
+            ArrayList<Group> groups = groupTable.selectAll();
+            if (groups.isEmpty()) {
+                groupTable.insert(new Group("Middle",1 ));
+                groupTable.insert(new Group("Senior",2 ));
+                groupTable.insert(new Group("Lead",3 ));
+                groups = groupTable.selectAll();
+
             }
 
-            // Выводим студенток
-            ResultSet femaleStudents = statement.executeQuery("SELECT * FROM Student WHERE sex = 'Ж'");
-            while (femaleStudents.next()) {
-                String studentFIO = femaleStudents.getString("fio");
-                System.out.println(studentFIO);
+            CuratorTable curatorTable = new CuratorTable();
+            ArrayList<Curator> curators = curatorTable.selectAll();
+            if (curators.isEmpty()) {
+                curatorTable.insert(new Curator("Денисов Дмитрий Артёмович"));
+                curatorTable.insert(new Curator("Рожков Михаил Степанович"));
+                curatorTable.insert(new Curator("Трофимов Александр Дмитриевич"));
+                curatorTable.insert(new Curator("Бобров Василий Степанович"));
             }
+            studentsTable.selectAllWomen();
+            System.out.println("-------------------------------------------------");
 
-            // Обновляем данные по группе, сменив куратора
-            statement.executeUpdate("UPDATE Group_table SET id_curator = 3 WHERE id = 1");
+            studentsTable.selectCount();
 
-            // Выводим список групп с их кураторами
-            ResultSet groupResult = statement.executeQuery("SELECT Group_table.name, " +
-                    "Curator.fio FROM Group_table INNER JOIN Curator ON Group_table.id_curator = Curator.id");
-            while (groupResult.next()) {
-                String groupName = groupResult.getString(1);
-                String curatorName = groupResult.getString(2);
-                System.out.println(groupName + ": " + curatorName);
-            }
-            // Выполняем вложенный запрос и выводим студентов из определенной группы
-            String groupNameToSearch = "Группа 1";
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT Student.fio FROM Student INNER JOIN " +
-                    "Group_table ON Student.id_group = Group_table.id WHERE Group_table.name = ?");
-            preparedStatement.setString(1, groupNameToSearch);
-            ResultSet specificGroupResult = preparedStatement.executeQuery();
-            while (specificGroupResult.next()) {
-                String studentFIO = specificGroupResult.getString(1);
-                System.out.println(studentFIO);
-            }
+            System.out.println("-------------------------------------------------");
+            studentsTable.selectAllStudentsFromGroup();
 
-            //Закрываем соединение с базой данных
-                connection.close();
-            }
-            catch (SQLException e) {
-            e.printStackTrace();
-            }
+            System.out.println("-------------------------------------------------");
+            studentsTable.selectAllStudentWitchGroupAndCurator();
+
+            System.out.println("-------------------------------------------------");
+            groupTable.selectAllGroupAndCurator();
+
+            groups.get(2).setId_curator(10);
+            groupTable.update(groups.get(2));
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            MySQLConnector.close();
         }
     }
+}

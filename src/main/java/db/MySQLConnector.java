@@ -1,5 +1,4 @@
 package db;
-
 import settings.ISettings;
 import settings.PropertiesReader;
 
@@ -7,37 +6,29 @@ import java.sql.*;
 import java.util.Map;
 
 public class MySQLConnector implements IDBConnector {
-    public static Connection connection = null;
-    public static Statement statement = null;
+    private static Connection connection = null;
+    private static Statement statement = null;
 
     public MySQLConnector() {
         connect();
     }
 
-    public static Connection getConnection() {
-        return connection;
-    }
-
-    public static void setConnection(Connection connection) {
-        MySQLConnector.connection = connection;
-    }
-
     private void connect() {
         ISettings reader = new PropertiesReader();
         Map<String, String> settings = reader.read();
-        if (getConnection() == null) {
+        if (connection == null){
             try {
-                setConnection(DriverManager
+                connection = DriverManager
                         .getConnection(settings.get("url") + "/" + settings.get("db_name"),
                                 settings.get("db_username"),
-                                settings.get("db_password")));
+                                settings.get("db_password"));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         if (statement == null) {
             try {
-                statement = getConnection().createStatement();
+                statement = connection.createStatement();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -61,21 +52,22 @@ public class MySQLConnector implements IDBConnector {
         return null;
     }
 
-    public void close() {
+    public static void close() {
         if (statement != null) {
             try {
                 statement.close();
+                statement = null;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        if (getConnection() != null) {
+        if (connection != null) {
             try {
-                getConnection().close();
+                connection.close();
+                connection = null;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-
     }
 }
